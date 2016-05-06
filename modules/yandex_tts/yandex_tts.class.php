@@ -144,7 +144,7 @@ function admin(&$out) {
 function usual(&$out) {
  $this->admin($out);
 }
- function processSubscription($event, $details='') {
+ function processSubscription($event, &$details) {
   $this->getConfig();
   if ($event=='SAY' && !$this->config['DISABLED'] && !$details['ignoreVoice']) {
     $level=$details['level'];
@@ -184,7 +184,10 @@ function usual(&$out) {
         } else {
          @touch($cachedFileName);
         }
-        playSound($cachedFileName, 1, $level);
+        if (file_exists($cachedFileName)) {
+          playSound($cachedFileName, 1, $level);
+          $details['ignoreVoice']=1;
+        }
     }
   }
  }
@@ -196,7 +199,7 @@ function usual(&$out) {
 * @access private
 */
  function install($data='') {
-  subscribeToEvent($this->name, 'SAY');
+  subscribeToEvent($this->name, 'SAY', '', 10);
   parent::install();
  }
 // --------------------------------------------------------------------
