@@ -113,10 +113,16 @@ function run() {
 function admin(&$out) {
  $this->getConfig();
  $out['ACCESS_KEY']=$this->config['ACCESS_KEY'];
+ $out['SPEAKER']=$this->config['SPEAKER'];
+ $out['EMOTION']=$this->config['EMOTION'];
  $out['DISABLED']=$this->config['DISABLED'];
  if ($this->view_mode=='update_settings') {
    global $access_key;
    $this->config['ACCESS_KEY']=$access_key;
+ 	global $speaker;
+   $this->config['SPEAKER']=$speaker;
+	global $emotion;
+   $this->config['EMOTION']=$emotion;
    global $disabled;
    $this->config['DISABLED']=$disabled;
    $this->saveConfig();
@@ -152,6 +158,8 @@ function usual(&$out) {
     
 
     $accessKey=$this->config['ACCESS_KEY'];
+	$speaker=$this->config['SPEAKER'];
+	$emotion=$this->config['EMOTION'];
     
     if ($level >= (int)getGlobal('minMsgLevel') && $accessKey!='')
     {
@@ -165,7 +173,7 @@ function usual(&$out) {
         {
 
            $lang = SETTINGS_SITE_LANGUAGE;
-           $qs = http_build_query(array('format' => 'mp3', 'lang' => $lang, 'speaker' => 'omazh', 'key' => $accessKey, 'text' => $message));
+           $qs = http_build_query(array('format' => 'mp3', 'lang' => $lang, 'speaker' => $speaker, emotion => $emotion, 'key' => $accessKey, 'text' => $message));
 
            try
            {
