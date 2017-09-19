@@ -210,6 +210,16 @@ function usual(&$out) {
   subscribeToEvent($this->name, 'SAY', '', 10);
   parent::install();
  }
+	
+ public function uninstall()
+   {
+      SQLExec("delete from pvalues where property_id in (select id FROM properties where object_id in (select id from objects where class_id = (select id from classes where title = 'yandex_tts')))");
+      SQLExec("delete from properties where object_id in (select id from objects where class_id = (select id from classes where title = 'yandex_tts'))");
+      SQLExec("delete from objects where class_id = (select id from classes where title = 'yandex_tts')");
+      SQLExec("delete from classes where title = 'yandex_tts'");
+      
+      parent::uninstall();
+   }
 // --------------------------------------------------------------------
 }
 /*
