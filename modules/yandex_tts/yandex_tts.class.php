@@ -135,7 +135,7 @@ function admin(&$out) {
  
  global $clean;
  if ($clean) {
-    array_map("unlink", glob(ROOT . "cached/voice/*_yandex.mp3"));
+    array_map("unlink", glob(ROOT . "cms/cached/voice/*_yandex.mp3"));
     $this->redirect("?ok=1");
  } 
 }
@@ -164,7 +164,7 @@ function usual(&$out) {
     if ($level >= (int)getGlobal('minMsgLevel') && $accessKey!='')
     {
         $filename       = md5($message) . '_yandex.mp3';
-        $cachedVoiceDir = ROOT . 'cached/voice';
+        $cachedVoiceDir = ROOT . 'cms/cached/voice';
         $cachedFileName = $cachedVoiceDir . '/' . $filename;
 
         $base_url       = 'https://tts.voicetech.yandex.net/generate?';        
