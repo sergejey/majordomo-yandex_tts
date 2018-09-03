@@ -171,13 +171,51 @@ function admin(&$out) {
 				$this->redirect('?view_mode=err');
 			}
 			break;
+		case 'emphasis_import':
+        	if($this->mode == 'update') {
+				$error = FALSE;
+            	global $file;
+            	if(file_exists($file)) {
+                	$tmp = LoadFile($file);
+                	$lines = mb_split("\n", $tmp);
+					foreach($lines as $line) {
+						$line = mb_split(':', $line);
+						$count = count($line);
+						if($count == 2 || $count == 3) {
+							$line[0] = str_replace('&#58;', ':', $line[0]);
+							$line[1] = str_replace('&#58;', ':', $line[1]);
+							$line[2] = ($count == 3?intval($line[2]):0);
+							if($query = SQLSelectOne("SELECT * FROM `yandex_tts_emphasis` WHERE `search_str` LIKE '".DBSafe($line[0])."'")) {
+								$query['search_str'] = $line[0];
+								$query['replace_str'] = $line[1];
+								$query['case'] = ($line[2]==1?1:0);
+								SQLUpdate('yandex_tts_emphasis', $query);
+							} else {
+								$query = array();
+								$query['search_str'] = $line[0];
+								$query['replace_str'] = $line[1];
+								$query['case'] = ($line[2]==1?1:0);
+								SQLInsert('yandex_tts_emphasis', $query);
+							}
+						}
+					}
+					$this->redirect('?view_mode=ok');
+				} else {
+					$this->redirect('?view_mode=err');
+				}
+				exit;
+			}
+			break;
 		case 'emphasis_export':
 			if($emphasis = SQLSelect('SELECT * FROM `yandex_tts_emphasis` ORDER BY `search_str`')) {
 				$data = '';
 				foreach($emphasis as $item) {
+					$item['search_str'] = str_replace(':', '&#58;', $item['search_str']);
+					$item['replace_str'] = str_replace(':', '&#58;', $item['replace_str']);
+					$item['case'] = intval($item['case']);
 					$data .= $item['search_str'].':'.$item['replace_str'].':'.$item['case'].PHP_EOL;
 				}
-				header('Content-Disposition: attachment; filename=yandex_tts_export_'.date('d-m-Y_H-i-s').'.txt');
+				header('Content-Disposition: attachment; filename=yandex_tts_export_'.date('d-m-Y_H-i-s').'.dic');
 				header('Content-Type: text/plain');
 				die($data);
 			} else {
@@ -192,7 +230,15 @@ function admin(&$out) {
 			break;
 	}
 	// Show emphasis list
-	$out['EMPHASIS_LIST'] = SQLSelect('SELECT * FROM `yandex_tts_emphasis` ORDER BY `search_str`');
+	$emphasis = SQLSelect('SELECT * FROM `yandex_tts_emphasis` ORDER BY `search_str`');
+	foreach($emphasis as $item) {
+		$out['EMPHASIS_LIST'][] = array(
+			'ID'			=> $item['ID'],
+			'search_str'	=> htmlspecialchars($item['search_str']),
+			'replace_str'	=> htmlspecialchars($item['replace_str']),
+			'case'			=> intval($item['case']),
+		);
+	}
 }
 
 /**
