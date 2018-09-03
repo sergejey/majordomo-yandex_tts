@@ -111,33 +111,73 @@ function run() {
 * @access public
 */
 function admin(&$out) {
- $this->getConfig();
- $out['ACCESS_KEY']=$this->config['ACCESS_KEY'];
- $out['SPEAKER']=$this->config['SPEAKER'];
- $out['EMOTION']=$this->config['EMOTION'];
- $out['DISABLED']=$this->config['DISABLED'];
- if ($this->view_mode=='update_settings') {
-   global $access_key;
-   $this->config['ACCESS_KEY']=$access_key;
- 	global $speaker;
-   $this->config['SPEAKER']=$speaker;
-	global $emotion;
-   $this->config['EMOTION']=$emotion;
-   global $disabled;
-   $this->config['DISABLED']=$disabled;
-   $this->saveConfig();
-   $this->redirect("?ok=1");
- }
-
- if ($_GET['ok']) {
-  $out['OK']=1;
- }
- 
- global $clean;
- if ($clean) {
-    array_map("unlink", glob(ROOT . "cms/cached/voice/*_yandex.mp3"));
-    $this->redirect("?ok=1");
- } 
+	$this->getConfig();
+	$out['ACCESS_KEY'] = $this->config['ACCESS_KEY'];
+	$out['SPEAKER'] = $this->config['SPEAKER'];
+	$out['EMOTION'] = $this->config['EMOTION'];
+	$out['EMPHASIS'] = $this->config['EMPHASIS'];
+	$out['DISABLED'] = $this->config['DISABLED'];
+	switch($this->view_mode) {
+		case 'update_settings':
+			global $access_key;
+			$this->config['ACCESS_KEY'] = $access_key;
+			global $speaker;
+			$this->config['SPEAKER'] = $speaker;
+			global $emotion;
+			$this->config['EMOTION'] = $emotion;
+			global $emphasis;
+			$this->config['EMPHASIS'] = $emphasis;
+			global $disabled;
+			$this->config['DISABLED'] = $disabled;
+			$this->saveConfig();
+			$this->redirect('?view_mode=ok');
+			break;
+		case 'clear_cache':
+			array_map('unlink', glob(ROOT.'cms/cached/voice/*_yandex.mp3'));
+			$this->redirect('?view_mode=ok');
+			break;
+		case 'add_emphasis':
+			global $search_str, $replace_str;
+			if(!empty($search_str) && !empty($replace_str)) {
+				if($query = SQLSelectOne("SELECT * FROM `yandex_tts_emphasis` WHERE `search_str` LIKE '".DBSafe($search_str)."'")) {
+					$query['search_str'] = $search_str;
+					$query['replace_str'] = $replace_str;
+					if(SQLUpdate('yandex_tts_emphasis', $query)) {
+						$this->redirect('?view_mode=ok');
+					} else {
+						$this->redirect('?view_mode=err');
+					}
+				} else {
+					$query = array();
+					$query['search_str'] = $search_str;
+					$query['replace_str'] = $replace_str;
+					if(SQLInsert('yandex_tts_emphasis', $query)) {
+						$this->redirect('?view_mode=ok');
+					} else {
+						$this->redirect('?view_mode=err');
+					}
+				}
+			} else {
+				$this->redirect('?view_mode=err');
+			}
+			break;
+		case 'delete_emphasis':
+			global $id;
+			if(SQLExec('DELETE FROM `yandex_tts_emphasis` WHERE `ID` = '.intval($id))) {
+				$this->redirect('?view_mode=ok');
+			} else {
+				$this->redirect('?view_mode=err');
+			}
+			break;
+		case 'ok':
+			$out['OK'] = 1;
+			break;
+		case 'err':
+			$out['ERR'] = 1;
+			break;
+	}
+	// Show emphasis list
+	$out['EMPHASIS_LIST'] = SQLSelect('SELECT * FROM `yandex_tts_emphasis` ORDER BY `search_str`');
 }
 
 /**
@@ -156,7 +196,15 @@ function usual(&$out) {
     $level=$details['level'];
     $message=$details['message'];
     
-
+	if($this->config['EMPHASIS']) {
+		$emphasis = SQLSelect('SELECT `search_str`, `replace_str` FROM `yandex_tts_emphasis`');
+		foreach($emphasis as $item) {
+			$message = preg_replace_callback('/('.preg_quote($item['search_str'], '/').')/ui', function($match) use($item) {
+				return $item['replace_str'];
+			}, $message);
+		}
+	}
+	
     $accessKey=$this->config['ACCESS_KEY'];
 	$speaker=$this->config['SPEAKER'];
 	$emotion=$this->config['EMOTION'];
@@ -210,6 +258,21 @@ function usual(&$out) {
   subscribeToEvent($this->name, 'SAY', '', 10);
   parent::install();
  }
+ 
+ function dbInstall($data) {
+$data = <<<EOD
+ yandex_tts_emphasis: ID int(10) unsigned NOT NULL auto_increment
+ yandex_tts_emphasis: search_str text 
+ yandex_tts_emphasis: replace_str text 
+EOD;
+  parent::dbInstall($data);
+ }
+ 
+ function uninstall() {
+  SQLExec('DROP TABLE IF EXISTS `yandex_tts_emphasis`');
+  parent::uninstall();
+ }
+ 
 // --------------------------------------------------------------------
 }
 /*

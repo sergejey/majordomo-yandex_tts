@@ -1,10 +1,10 @@
-
- [#if VIEW_MODE="search_yandex_tts" || VIEW_MODE=""#]
-
 [#if OK#]
-   <div class="alert alert-success"><#LANG_DATA_SAVED#></div>
+	<div class="alert alert-success"><#LANG_DATA_SAVED#></div>
 [#endif OK#]
 
+[#if ERR#]
+	<div class="alert alert-danger">Ошибка выполнения команды!</div>
+[#endif ERR#]
  
 <!-- table zwave_devices search -->
 <div id='api_settings'>
@@ -30,11 +30,8 @@
     <option value="ermil" [#if SPEAKER=="ermil"#] selected[#endif#]>ermil</option>
 </optgroup>
    </select>
-
-
 </div>
 </div>
-
 
 <div class="form-group">
  <label class="control-label">Эмоциональная окраска голоса: </label>
@@ -47,6 +44,13 @@
 </div>
 </div>
 
+<div class="form-group">
+ <label class="control-label">Использовать словарь ударений:</label>
+ <div class="col-lg-6">
+ <input type="radio" name="emphasis" value="1"[#if EMPHASIS=="1"#] checked[#endif#]><#LANG_ON#>
+ <input type="radio" name="emphasis" value="0"[#if EMPHASIS!="1"#] checked[#endif#]><#LANG_OFF#>
+ </div>
+</div>
 
 <div class="form-group">
  <label class="control-label"> <#LANG_VALUE#>: (*) </label>
@@ -60,9 +64,97 @@
 <button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_UPDATE#></button>
 <input type="hidden" name="view_mode" value="update_settings">
 <input type="hidden" name="mode" value="update">
+<a href="?view_mode=clear_cache" class="btn btn-default">Очистить кэш</a>
 </div>
 </fieldset>
 </form>
-<div class="pull-left"><a href="?clean=1" class="btn btn-default">Clear cache</a></div>
+
+<style>
+	#emphasis_panel {
+		border: #a8a8a8 solid 1px;
+		margin-top: 25px;
+		text-align: center;
+		padding: 5px;
+		background-color: #d4d4d4;
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
+	}
+	#emphasis_panel a:focus {
+		outline: none;
+	}
+	#emphasis_list {
+		border: #a8a8a8 solid 1px;
+		padding-top: 20px;
+		display: none;
+	}
+	#emphasis_list p {
+		text-align: center;
+	}
+	#emphasis_list form {
+		padding: 10px 50px 20px 50px;
+	}
+	#emphasis_list form table {
+		width: 100%;
+	}
+	#emphasis_list form table tr {
+		border: #d4d4d4 solid 1px;
+	}
+	#emphasis_list form table tr.tbl_header {
+		background-color: #d4d4d4;
+	}
+	tr.tbl_header th, tr.tbl_header td {
+		text-align: center;
+	}
+	th.tbl_actions, td.tbl_actions {
+		text-align: center;
+		width: 100px;
+	}
+	tr.tbl_item:hover {
+		background-color: #f5f5f5;
+	}
+</style>
+
+<div id="emphasis_panel">
+	<b>[<a href="#" onclick="$('#emphasis_list').slideToggle(); return false;">Показать/Скрыть словать ударений</a>]</b>
 </div>
- [#endif VIEW_MODE#]
+<div id="emphasis_list">
+	<p><i>Для принудительной установки ударения используйте символ + (плюс) перед гласной ударной буквой.</i></p>
+	<form action="?" method="post" enctype="multipart/form-data" name="frmWrdfix" class="form-horizontal">
+		<table>
+			<tr class="tbl_header">
+				<th>Строка для поиска</th>
+				<th>Строка для замены</th>
+				<th class="tbl_actions">&nbsp;</th>
+			</tr>
+			<tr class="tbl_header">
+				<td><input type="text" name="search_str" placeholder="Пример: &laquo;загружена&raquo;" class="form-control"></td>
+				<td><input type="text" name="replace_str" placeholder="Пример: &laquo;загр+ужена&raquo;" class="form-control"></td>
+				<td class="tbl_actions"><button type="submit" name="subm" value="Submit" class="btn btn-primary">Сохранить</button></td>
+			</tr>
+			[#begin EMPHASIS_LIST#]
+			<tr class="tbl_item">
+				<td class="td_search_str">[#search_str#]</td>
+				<td class="td_replace_str">[#replace_str#]</td>
+				<td class="tbl_actions">
+					<a href="#" onclick="return emphasis_edit(this);" title="Изменить"><span class="glyphicon glyphicon-pencil"></span></a>
+					&nbsp;
+					<a href="?view_mode=delete_emphasis&id=[#ID#]" onclick="return confirm('Вы уверены? Пожалуйста, подтвердите операцию.')" title="Удалить"><span class="glyphicon glyphicon-remove"></span></a>
+				</td>
+			</tr>
+			[#end EMPHASIS_LIST#]
+		</table>
+		<input type="hidden" name="view_mode" value="add_emphasis">
+	</form>
+	<script type="text/javascript">
+		function emphasis_edit(obj) {
+			var tr = $(obj).closest('tr');
+			var search_str = $(tr).find('td.td_search_str').text();
+			var replace_str = $(tr).find('td.td_replace_str').text();
+			$('input[name=search_str]').val(search_str);
+			$('input[name=replace_str]').val(replace_str);
+			return false;
+		}
+	</script>
+</div>
+
+</div>
