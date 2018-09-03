@@ -83,12 +83,13 @@
 		outline: none;
 	}
 	#emphasis_list {
+		text-align: center;
 		border: #a8a8a8 solid 1px;
 		padding-top: 20px;
 		display: none;
 	}
 	#emphasis_list p {
-		text-align: center;
+		margin: 10px 0 10px 0;
 	}
 	#emphasis_list form {
 		padding: 10px 50px 20px 50px;
@@ -106,12 +107,16 @@
 		text-align: center;
 	}
 	th.tbl_actions, td.tbl_actions {
-		text-align: center;
 		width: 100px;
 	}
 	th.td_case, td.td_case {
-		text-align: center;
 		width: 75px;
+	}
+	th.td_search_str, td.td_search_str {
+		text-align: left;
+	}
+	th.td_replace_str, td.td_replace_str {
+		text-align: left;
 	}
 	tr.tbl_item:hover {
 		background-color: #f5f5f5;
@@ -122,6 +127,7 @@
 	<b>[<a href="#" onclick="$('#emphasis_list').slideToggle(); return false;">Показать/Скрыть словать ударений</a>]</b>
 </div>
 <div id="emphasis_list">
+	<a href="?view_mode=emphasis_export" class="btn btn-default">Экспорт словаря</a>
 	<p><i>Для принудительной установки ударения используйте символ + (плюс) перед гласной ударной буквой.</i></p>
 	<form action="?" method="post" enctype="multipart/form-data" name="frmWrdfix" class="form-horizontal">
 		<table>

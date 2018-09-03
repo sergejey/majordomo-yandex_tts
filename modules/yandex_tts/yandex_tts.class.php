@@ -171,6 +171,19 @@ function admin(&$out) {
 				$this->redirect('?view_mode=err');
 			}
 			break;
+		case 'emphasis_export':
+			if($emphasis = SQLSelect('SELECT * FROM `yandex_tts_emphasis` ORDER BY `search_str`')) {
+				$data = '';
+				foreach($emphasis as $item) {
+					$data .= $item['search_str'].':'.$item['replace_str'].':'.$item['case'].PHP_EOL;
+				}
+				header('Content-Disposition: attachment; filename=yandex_tts_export_'.date('d-m-Y_H-i-s').'.txt');
+				header('Content-Type: text/plain');
+				die($data);
+			} else {
+				$this->redirect('?view_mode=err');
+			}
+			break;
 		case 'ok':
 			$out['OK'] = 1;
 			break;
