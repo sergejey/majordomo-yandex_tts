@@ -164,7 +164,7 @@
 			}
 		</style>
 		<div id="emphasis_panel">
-			<b>[<a href="#" onclick="$('#emphasis_list').slideToggle(); return false;">Показать/Скрыть словать ударений</a>]</b>
+			<b>[<a href="#" id="emphasis_list_toggle" onclick="return emphasis_list_toggle();">Показать/Скрыть словать ударений</a>]</b>
 		</div>
 		<div id="emphasis_list">
 			<a href="?view_mode=emphasis_clear" class="btn btn-danger" onclick="return confirm('Вы действительно хотите удалить все записи из словаря ударений?');">Очистить словарь</a>
@@ -201,6 +201,17 @@
 				<input type="hidden" name="view_mode" value="add_emphasis">
 			</form>
 			<script type="text/javascript">
+				$(document).ready(function() {
+					if(getCookie('emphasis_list_show') == 'true') {
+						$('#emphasis_list_toggle').click();
+					}
+				});
+				function emphasis_list_toggle() {
+					$('#emphasis_list').slideToggle(500, 'swing', function() {
+						setCookie('emphasis_list_show', $(this).is(':visible'));
+					});
+					return false;
+				}
 				function emphasis_edit(obj) {
 					var tr = $(obj).closest('tr');
 					var search_str = $(tr).find('td.td_search_str').text();
