@@ -171,6 +171,13 @@ function admin(&$out) {
 				$this->redirect('?view_mode=err');
 			}
 			break;
+		case 'emphasis_clear':
+			if(SQLExec('TRUNCATE TABLE `yandex_tts_emphasis`')) {
+				$this->redirect('?view_mode=ok');
+			} else {
+				$this->redirect('?view_mode=err');
+			}
+			break;
 		case 'emphasis_import':
         	if($this->mode == 'update') {
 				$error = FALSE;
@@ -203,7 +210,6 @@ function admin(&$out) {
 				} else {
 					$this->redirect('?view_mode=err');
 				}
-				exit;
 			}
 			break;
 		case 'emphasis_export':
