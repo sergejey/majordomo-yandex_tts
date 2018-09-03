@@ -137,11 +137,12 @@ function admin(&$out) {
 			$this->redirect('?view_mode=ok');
 			break;
 		case 'add_emphasis':
-			global $search_str, $replace_str;
+			global $search_str, $replace_str, $case;
 			if(!empty($search_str) && !empty($replace_str)) {
 				if($query = SQLSelectOne("SELECT * FROM `yandex_tts_emphasis` WHERE `search_str` LIKE '".DBSafe($search_str)."'")) {
 					$query['search_str'] = $search_str;
 					$query['replace_str'] = $replace_str;
+					$query['case'] = ($case=='1'?1:0);
 					if(SQLUpdate('yandex_tts_emphasis', $query)) {
 						$this->redirect('?view_mode=ok');
 					} else {
@@ -151,6 +152,7 @@ function admin(&$out) {
 					$query = array();
 					$query['search_str'] = $search_str;
 					$query['replace_str'] = $replace_str;
+					$query['case'] = ($case=='1'?1:0);
 					if(SQLInsert('yandex_tts_emphasis', $query)) {
 						$this->redirect('?view_mode=ok');
 					} else {
@@ -197,11 +199,15 @@ function usual(&$out) {
     $message=$details['message'];
     
 	if($this->config['EMPHASIS']) {
-		$emphasis = SQLSelect('SELECT `search_str`, `replace_str` FROM `yandex_tts_emphasis`');
+		$emphasis = SQLSelect('SELECT * FROM `yandex_tts_emphasis`');
 		foreach($emphasis as $item) {
-			$message = preg_replace_callback('/('.preg_quote($item['search_str'], '/').')/ui', function($match) use($item) {
-				return $item['replace_str'];
-			}, $message);
+			if($item['case']) {
+				$message = str_replace($item['search_str'], $item['replace_str'], $message);
+			} else {
+				$message = preg_replace_callback('/('.preg_quote($item['search_str'], '/').')/ui', function($match) use($item) {
+					return $item['replace_str'];
+				}, $message);
+			}
 		}
 	}
 	
@@ -262,8 +268,9 @@ function usual(&$out) {
  function dbInstall($data) {
 $data = <<<EOD
  yandex_tts_emphasis: ID int(10) unsigned NOT NULL auto_increment
- yandex_tts_emphasis: search_str text 
- yandex_tts_emphasis: replace_str text 
+ yandex_tts_emphasis: search_str text
+ yandex_tts_emphasis: replace_str text
+ yandex_tts_emphasis: case boolean NOT NULL DEFAULT FALSE
 EOD;
   parent::dbInstall($data);
  }

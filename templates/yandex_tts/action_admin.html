@@ -109,6 +109,10 @@
 		text-align: center;
 		width: 100px;
 	}
+	th.td_case, td.td_case {
+		text-align: center;
+		width: 75px;
+	}
 	tr.tbl_item:hover {
 		background-color: #f5f5f5;
 	}
@@ -124,17 +128,20 @@
 			<tr class="tbl_header">
 				<th>Строка для поиска</th>
 				<th>Строка для замены</th>
+				<th class="td_case">Регистр</th>
 				<th class="tbl_actions">&nbsp;</th>
 			</tr>
 			<tr class="tbl_header">
 				<td><input type="text" name="search_str" placeholder="Пример: &laquo;загружена&raquo;" class="form-control"></td>
 				<td><input type="text" name="replace_str" placeholder="Пример: &laquo;загр+ужена&raquo;" class="form-control"></td>
+				<td><input type="checkbox" name="case" value="1" title="Учитывать регистр"></td>
 				<td class="tbl_actions"><button type="submit" name="subm" value="Submit" class="btn btn-primary">Сохранить</button></td>
 			</tr>
 			[#begin EMPHASIS_LIST#]
 			<tr class="tbl_item">
 				<td class="td_search_str">[#search_str#]</td>
 				<td class="td_replace_str">[#replace_str#]</td>
+				<td class="td_case">[#if case=="1"#]<i class="glyphicon glyphicon-ok"></i>[#endif#]</td>
 				<td class="tbl_actions">
 					<a href="#" onclick="return emphasis_edit(this);" title="Изменить"><span class="glyphicon glyphicon-pencil"></span></a>
 					&nbsp;
@@ -150,8 +157,12 @@
 			var tr = $(obj).closest('tr');
 			var search_str = $(tr).find('td.td_search_str').text();
 			var replace_str = $(tr).find('td.td_replace_str').text();
+			var case_html = $(tr).find('td.td_case').html();
 			$('input[name=search_str]').val(search_str);
 			$('input[name=replace_str]').val(replace_str);
+			if(case_html.length > 0) {
+				$('input[name=case]').prop('checked', true);
+			}
 			return false;
 		}
 	</script>
