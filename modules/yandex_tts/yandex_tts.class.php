@@ -314,6 +314,12 @@ function usual(&$out) {
         if (file_exists($cachedFileName)) {
           playSound($cachedFileName, 1, $level);
           $details['ignoreVoice']=1;
+			processSubscriptions('SAY_CACHED_READY', array(
+				'level' => $level,
+				'tts_engine' => 'yandex',
+				'message' => $message,
+				'filename' => $cachedFileName,
+				));
         }
     }
   }
