@@ -259,10 +259,16 @@ function usual(&$out) {
 }
  function processSubscription($event, &$details) {
   $this->getConfig();
-  if ($event=='SAY' && !$this->config['DISABLED'] && !$details['ignoreVoice']) {
-    $level=$details['level'];
-    $message=$details['message'];
-    
+	 $level=$details['level'];
+	 $message=$details['message'];
+	 $destination = $details['destination'];
+	 $filename       = md5($message) . '_yandex.mp3';
+	 $cachedVoiceDir = ROOT . 'cms/cached/voice';
+	 $cachedFileName = $cachedVoiceDir . '/' . $filename;
+
+
+	 if (($event=='SAY' || $event=='SAYTO' || $event=='ASK') && !$this->config['DISABLED'] && !$details['ignoreVoice']) {
+
 	if($this->config['EMPHASIS']) {
 		$emphasis = SQLSelect('SELECT * FROM `yandex_tts_emphasis`');
 		foreach($emphasis as $item) {
@@ -280,20 +286,13 @@ function usual(&$out) {
 	$speaker=$this->config['SPEAKER'];
 	$emotion=$this->config['EMOTION'];
     
-    if ($level >= (int)getGlobal('minMsgLevel') && $accessKey!='')
+    if ($accessKey!='')
     {
-        $filename       = md5($message) . '_yandex.mp3';
-        $cachedVoiceDir = ROOT . 'cms/cached/voice';
-        $cachedFileName = $cachedVoiceDir . '/' . $filename;
-
-        $base_url       = 'https://tts.voicetech.yandex.net/generate?';        
-
+        $base_url       = 'https://tts.voicetech.yandex.net/generate?';
         if (!file_exists($cachedFileName))
         {
-
            $lang = SETTINGS_SITE_LANGUAGE;
            $qs = http_build_query(array('format' => 'mp3', 'lang' => $lang, 'speaker' => $speaker, emotion => $emotion, 'key' => $accessKey, 'text' => $message));
-
            try
            {
               $contents = file_get_contents($base_url . $qs);
@@ -302,7 +301,6 @@ function usual(&$out) {
            {
               registerError('yandextts', get_class($e) . ', ' . $e->getMessage());
            }
-   
            if (isset($contents))
            {
               CreateDir($cachedVoiceDir);
@@ -312,16 +310,21 @@ function usual(&$out) {
          @touch($cachedFileName);
         }
         if (file_exists($cachedFileName)) {
-          playSound($cachedFileName, 1, $level);
-          $details['ignoreVoice']=1;
+			if ($event=='SAY' && $level >= (int)getGlobal('minMsgLevel')) {
+				playSound($cachedFileName, 1, $level);
+			}
+          //$details['ignoreVoice']=1;
 			processSubscriptions('SAY_CACHED_READY', array(
 				'level' => $level,
 				'tts_engine' => 'yandex',
 				'message' => $message,
 				'filename' => $cachedFileName,
+				'destination' => $destination,
+				'event' => $event,
 				));
         }
     }
+
   }
  }
 /**
@@ -333,6 +336,8 @@ function usual(&$out) {
 */
  function install($data='') {
   subscribeToEvent($this->name, 'SAY', '', 10);
+	 subscribeToEvent($this->name, 'SAYTO');
+	 subscribeToEvent($this->name, 'ASK');
   parent::install();
  }
  
@@ -348,6 +353,9 @@ EOD;
  
  function uninstall() {
   SQLExec('DROP TABLE IF EXISTS `yandex_tts_emphasis`');
+	 unsubscribeFromEvent($this->name, 'SAY');
+	 unsubscribeFromEvent($this->name, 'SAYTO');
+	 unsubscribeFromEvent($this->name, 'ASK');
   parent::uninstall();
  }
  
