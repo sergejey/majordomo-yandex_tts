@@ -310,18 +310,19 @@ function usual(&$out) {
          @touch($cachedFileName);
         }
         if (file_exists($cachedFileName)) {
-			if ($event=='SAY' && $level >= (int)getGlobal('minMsgLevel')) {
-				playSound($cachedFileName, 1, $level);
-			}
-          //$details['ignoreVoice']=1;
-			processSubscriptions('SAY_CACHED_READY', array(
+		processSubscriptionsSafe('SAY_CACHED_READY', array(
 				'level' => $level,
 				'tts_engine' => 'yandex',
-				'message' => $message,
 				'filename' => $cachedFileName,
 				'destination' => $destination,
 				'event' => $event,
-				));
+				'message' => $message,
+		));	
+		if ($event=='SAY' && $level >= (int)getGlobal('minMsgLevel')) {
+				playSound($cachedFileName, 1, $level);
+			}
+          //$details['ignoreVoice']=1;
+			
         }
     }
 
