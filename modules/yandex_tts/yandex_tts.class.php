@@ -291,7 +291,7 @@ function usual(&$out) {
         $base_url       = 'https://tts.voicetech.yandex.net/generate?';
         if (!file_exists($cachedFileName))
         {
-           $lang = SETTINGS_SITE_LANGUAGE;
+           $lang = SETTINGS_SITE_LANGUAGE_CODE;
            $qs = http_build_query(array('format' => 'mp3', 'lang' => $lang, 'speaker' => $speaker, emotion => $emotion, 'key' => $accessKey, 'text' => $message));
            try
            {
