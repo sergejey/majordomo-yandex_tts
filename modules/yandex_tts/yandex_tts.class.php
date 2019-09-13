@@ -304,7 +304,7 @@ if (!isset($token) || (strtotime($token_expire) < time())) {
         $this->config['TOKENEXPIRE'] = $token_expire;
         $this->saveConfig();
 
-DebMes('Yandex TTS generate new Token');
+//DebMes('Yandex TTS generate new Token');
 }
 $url = "https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize";
 $lang=str_replace('_','-',$lang);
@@ -396,10 +396,10 @@ function usual(&$out) {
            {
               if ($new_auth) {
                       $contents = $this->ya_speech($message,$lang,$speaker,$emotion);
-                        DebMes('new_auth');
+                       // DebMes('new_auth');
               } else {
                       $contents = file_get_contents($base_url . $qs);
-                        DebMes($qs);
+                       // DebMes($qs);
               }
            }
            catch (Exception $e)
