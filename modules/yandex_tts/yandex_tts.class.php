@@ -114,7 +114,8 @@ function run() {
 function admin(&$out) {
         $this->getConfig();
 //DebMes($this->getConfig());
-//      $out['ACCESS_KEY'] = $this->config['ACCESS_KEY'];
+        $out['NEW_AUTH'] = $this->config['NEW_AUTH'];
+        $out['ACCESS_KEY'] = $this->config['ACCESS_KEY'];
         $out['OAUTH'] = $this->config['OAUTH'];
         $out['FOLDERID'] = $this->config['FOLDERID'];
         $out['SPEAKER'] = $this->config['SPEAKER'];
@@ -123,6 +124,10 @@ function admin(&$out) {
         $out['DISABLED'] = $this->config['DISABLED'];
         switch($this->view_mode) {
                 case 'update_settings':
+                        global $new_auth;
+                        $this->config['NEW_AUTH'] = $new_auth;
+                        global $access_key;
+                        $this->config['ACCESS_KEY'] = $access_key;
                         global $oauth;
                         $this->config['OAUTH'] = $oauth;
                         global $folderID;
@@ -299,7 +304,7 @@ if (!isset($token) || (strtotime($token_expire) < time())) {
         $this->config['TOKENEXPIRE'] = $token_expire;
         $this->saveConfig();
 
-DebMes('Yandex TTS generate new Token');
+//DebMes('Yandex TTS generate new Token');
 }
 $url = "https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize";
 $lang=str_replace('_','-',$lang);
@@ -372,13 +377,15 @@ function usual(&$out) {
                         }
                 }
         }
-
+    if ($this->config['NEW_AUTH']) { $new_auth=1; }
+    else { $new_auth=0; }
     $oauth=$this->config['OAUTH'];
     $folderID=$this->config['FOLDERID'];
-        $speaker=$this->config['SPEAKER'];
-        $emotion=$this->config['EMOTION'];
+    $accessKey=$this->config['ACCESS_KEY'];
+    $speaker=$this->config['SPEAKER'];
+    $emotion=$this->config['EMOTION'];
     //DebMes($oauth.' '.$folderID);
-    if (($oauth!='') && ($folderID!=''))
+    if (($oauth!='') && ($folderID!='') || ($accessKey!=''))
     {
         $base_url       = 'https://tts.voicetech.yandex.net/generate?';
         if (!file_exists($cachedFileName))
@@ -387,7 +394,13 @@ function usual(&$out) {
            $qs = http_build_query(array('format' => 'mp3', 'lang' => $lang, 'speaker' => $speaker, 'emotion' => $emotion, 'key' => $accessKey, 'text' => $message));
            try
            {
-              $contents = $this->ya_speech($message,$lang,$speaker,$emotion);
+              if ($new_auth) {
+                      $contents = $this->ya_speech($message,$lang,$speaker,$emotion);
+                       // DebMes('new_auth');
+              } else {
+                      $contents = file_get_contents($base_url . $qs);
+                       // DebMes($qs);
+              }
            }
            catch (Exception $e)
            {
