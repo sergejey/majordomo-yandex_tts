@@ -58,10 +58,18 @@
                 <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
                         <fieldset>
                                 <div class="form-group">
+                                        <label class="control-label">Авторизация по OAUTH + FolderID</label>
+                                        <input type="checkbox" name="new_auth" value="checked" onclick="showMe(this)" [#NEW_AUTH#]>
+                                </div>
+                                <div class="form-group apikey" [#if NEW_AUTH=="checked"#]style="display:none"[#endif#]>
+                                        <label class="control-label"> Yandex API key: (*)</label>
+                                        <div class="col-lg-6"><input type="text" class="form-control" name="access_key" value="[#ACCESS_KEY#]" class="input"></div>
+                                </div>
+                                <div class="form-group oauth" [#if NEW_AUTH!="checked"#]style="display:none"[#endif#]>
                                         <label class="control-label"> Yandex OAUTH: (*)</label>
                                         <div class="col-lg-6"><input type="text" class="form-control" name="oauth" value="[#OAUTH#]" class="input"></div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group oauth" [#if NEW_AUTH!="checked"#]style="display:none"[#endif#]>
                                         <label class="control-label"> Yandex FolderID: (*)</label>
                                         <div class="col-lg-6"><input type="text" class="form-control" name="folderID" value="[#FOLDERID#]" class="input"></div>
                                 </div>
@@ -207,6 +215,13 @@
                                 <input type="hidden" name="view_mode" value="add_emphasis">
                         </form>
                         <script type="text/javascript">
+                                function showMe (box) {
+                                        var vis = (box.checked) ? "block" : "none";
+                                        var vis2 = (box.checked) ? "none" : "block";
+                                        $('.oauth').css("display", vis);
+                                        $('.apikey').css("display", vis2);
+                                }
+
                                 $(document).ready(function() {
                                         if(getCookie('emphasis_list_show') == 'true') {
                                                 $('#emphasis_list_toggle').click();
