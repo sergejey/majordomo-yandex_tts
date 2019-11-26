@@ -283,7 +283,6 @@ class yandex_tts extends module {
             }
             $res = curl_exec($ch2);
             curl_close($ch2);
-            file_put_contents('ya_token', $res);
             $res = json_decode($res);
             $token = $res->iamToken;
             $token_expire = $res->expiresAt;
