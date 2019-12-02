@@ -409,6 +409,20 @@ class yandex_tts extends module {
                 } else {
                     @touch($cachedFileName);
                 }
+				// add for terminals 2
+                if ($details['SOURCE']) {
+					if (($event == 'SAY' OR $event == 'SAYTO' OR $event == 'SAYREPLY') AND !$this->config['DISABLED']) {
+						DebMes("Processing $event: " . json_encode($details, JSON_UNESCAPED_UNICODE), 'terminals');
+						$details['CACHED_FILENAME'] = $cachedFileName;
+						$details['tts_engine']      = 'yandex_tts';
+						if (file_exists($cachedFileName) && filesize($cachedFileName)) {
+                            processSubscriptions('SAY_CACHED_READY', $details);
+						    $details['BREAK'] = true;
+						}
+					}
+					return true;
+				}
+				
                 if (file_exists($cachedFileName) && filesize($cachedFileName)) {
                     processSubscriptionsSafe('SAY_CACHED_READY', array('level' => $level, 'tts_engine' => 'yandex', 'filename' => $cachedFileName, 'destination' => $destination, 'event' => $event, 'message' => $message,));
                     if ($event == 'SAY' && $level >= (int)getGlobal('minMsgLevel')) {
@@ -428,9 +442,10 @@ class yandex_tts extends module {
      * @access private
      */
     function install($data = '') {
-        subscribeToEvent($this->name, 'SAY', '', 10);
-        subscribeToEvent($this->name, 'SAYTO');
-        subscribeToEvent($this->name, 'ASK');
+        subscribeToEvent($this->name, 'SAY', '', 100);
+        subscribeToEvent($this->name, 'SAYTO', '', 100);
+        subscribeToEvent($this->name, 'ASK', '', 100);
+        subscribeToEvent($this->name, 'SAYREPLY', '', 100);
         parent::install();
     }
     function dbInstall($data) {
@@ -447,6 +462,7 @@ EOD;
         unsubscribeFromEvent($this->name, 'SAY');
         unsubscribeFromEvent($this->name, 'SAYTO');
         unsubscribeFromEvent($this->name, 'ASK');
+        unsubscribeFromEvent($this->name, 'SAYREPLY');
         parent::uninstall();
     }
     // --------------------------------------------------------------------
