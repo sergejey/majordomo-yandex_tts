@@ -362,19 +362,6 @@ class yandex_tts extends module {
         if ($this->MyDebug) DebMes('cachedFileName: ' . $cachedFileName);
         //$this->config['DISABLED'] = false;
 	
-        // add for terminals 2 for old  variant
-        if ($details['SOURCE']) {
-            if (($event == 'SAY' OR $event == 'SAYTO' OR $event == 'SAYREPLY') AND !$this->config['DISABLED']) {        
-                DebMes("Processing $event: " . json_encode($details, JSON_UNESCAPED_UNICODE), 'terminals');
-                $details['CACHED_FILENAME'] = $cachedFileName;
-                $details['tts_engine']      = 'yandex_tts';
-                if (file_exists($cachedFileName) && filesize($cachedFileName)) {
-                    processSubscriptions('SAY_CACHED_READY', $details);
-                    $details['BREAK'] = true;
-                }
-            }
-            return true;
-        }
         if (($event == 'SAY' || $event == 'SAYTO' || $event == 'ASK') && !$this->config['DISABLED'] && !$details['ignoreVoice']) {
             if ($this->config['EMPHASIS']) {
                 $emphasis = SQLSelect('SELECT * FROM `yandex_tts_emphasis`');
