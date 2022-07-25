@@ -373,7 +373,7 @@ class yandex_tts extends module {
 	    }
 	}
 	    
-        if (($event == 'SAY' || $event == 'SAYTO' || $event == 'ASK') && !$this->config['DISABLED'] && !$details['ignoreVoice']) {
+        if (($event == 'SAY' || $event == 'SAYTO' || $event == 'ASK') && !$this->config['DISABLED'] && !$details['ignoreVoice'] && ($level >= (int)getGlobal('minMsgLevel'))) {
             if ($this->config['EMPHASIS']) {
                 $emphasis = SQLSelect('SELECT * FROM `yandex_tts_emphasis`');
                 foreach ($emphasis as $item) {
