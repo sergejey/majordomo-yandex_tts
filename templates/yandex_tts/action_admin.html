@@ -1,270 +1,444 @@
 [#if OK#]
-        <div class="alert alert-success"><#LANG_DATA_SAVED#></div>
+        <div class="alert alert-success" style="border-left: 5px solid #28a745; background: #e9f7ec;"><#LANG_DATA_SAVED#></div>
 [#endif OK#]
 
 [#if ERR#]
-        <div class="alert alert-danger">Ошибка выполнения команды!</div>
+        <div class="alert alert-danger" style="border-left: 5px solid #dc3545; background: #f8dddd;">Ошибка выполнения команды!</div>
 [#endif ERR#]
 
 [#if VIEW_MODE="emphasis_import"#]
-        <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal" style="margin-left: 15px;">
-                <fieldset>
-                        <h2><small>Импорт словаря ударений</small></h2>
-                        [#if TOTAL#]
-                                <div class="alert alert-success"><#LANG_STRING_SUCCESS#></div>
-                                <div class="alert alert-success">Всего импортировано: [#TOTAL#]</div>
-                        [#endif TOTAL#]
-                        <div class="form-group">
-                                <label>Файл словаря:</label>
-                                <div><input type="file" name="file"></div>
-                                <span class="help-block" style="margin: 20px 0 10px 0;">
+        <div class="yandex-card" style="background: #fffbe6; border: 2px solid #f5d742;">
+                <h2 class="yandex-title" style="border-bottom-color: #f5d742;"><span class="yandex-icon">📥</span> Импорт словаря ударений</h2>
+                [#if TOTAL#]
+                        <div class="alert alert-success" style="border-left: 5px solid #28a745; background: #e9f7ec;"><#LANG_STRING_SUCCESS#></div>
+                        <div class="alert alert-success" style="border-left: 5px solid #28a745; background: #e9f7ec;">Всего импортировано: [#TOTAL#]</div>
+                [#endif TOTAL#]
+                <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="yandex-form">
+                        <div class="yandex-form-group">
+                                <label class="yandex-label">Файл словаря:</label>
+                                <div class="yandex-file-input">
+                                        <input type="file" name="file" id="fileInput">
+                                        <label for="fileInput" class="yandex-file-label">Выберите файл</label>
+                                </div>
+                                <span class="yandex-help" style="margin-top: 25px;">
                                         Формат файла (текстовый, unicode, каждая запись с новой строки):
-                                        <p style="margin: 10px;">слово_для_поиска : слово_для_замены : учитывать_регистр</p>
-                                        <table>
-                                                <tr>
-                                                        <td width="150"><i>слово_для_поиска</i></td>
-                                                        <td width="20">-</td>
-                                                        <td>любая последовательность символов, кроме двоеточия (используйте код &amp;&#35;58&#59; для его замены);</td>
-                                                </tr>
-                                                <tr>
-                                                        <td width="150"><i>слово_для_замены</i></td>
-                                                        <td width="20">-</td>
-                                                        <td>любая последовательность символов, кроме двоеточия (используйте код &amp;&#35;58&#59; для его замены);</td>
-                                                </tr>
-                                                <tr>
-                                                        <td width="150"><i>учитывать_регистр</i></td>
-                                                        <td width="20">-</td>
-                                                        <td>числовое значение (1 - учитывать, 0 - не учитывать);</td>
-                                                </tr>
-                                                <tr>
-                                                        <td width="150"><i>разделитель</i></td>
-                                                        <td width="20">-</td>
-                                                        <td>двоеточие.</td>
-                                                </tr>
+                                        <p style="margin: 10px 0;">слово_для_поиска : слово_для_замены : учитывать_регистр</p>
+                                        <table class="yandex-help-table">
+                                                <tr><td width="150"><i>слово_для_поиска</i></td><td width="20">–</td><td>любая последовательность символов, кроме двоеточия (используйте код &amp;&#35;58&#59; для его замены);</td></tr>
+                                                <tr><td width="150"><i>слово_для_замены</i></td><td width="20">–</td><td>любая последовательность символов, кроме двоеточия (используйте код &amp;&#35;58&#59; для его замены);</td></tr>
+                                                <tr><td width="150"><i>учитывать_регистр</i></td><td width="20">–</td><td>числовое значение (1 – учитывать, 0 – не учитывать);</td></tr>
+                                                <tr><td width="150"><i>разделитель</i></td><td width="20">–</td><td>двоеточие.</td></tr>
                                         </table>
+
+                                        <!-- ПРИМЕР -->
+                                        <div style="margin-top: 12px; margin-bottom: 20px; padding: 10px 14px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #1890ff;">
+                                                <strong style="color: #0050b3;">📌 Пример экранирования двоеточия</strong>
+                                                <p style="margin: 6px 0 0 0; font-size: 13px; color: #333;">
+                                                        Если в <strong>слове для поиска</strong> или <strong>строке замены</strong> есть символ <code>:</code>, 
+                                                        его нужно заменить на <code>&amp;#58;</code> – иначе импорт «сломается».
+                                                </p>
+                                                <ul style="margin: 6px 0 0 20px; font-size: 13px; color: #333;">
+                                                        <li><strong>Что вы хотите сделать:</strong> заменить фразу <code>10:00</code> на <code>десять часов</code></li>
+                                                        <li><strong>Как записать в файле (правильно):</strong> <code>10&amp;#58;00 : десять часов : 0</code></li>
+                                                        <li><strong>Что получится после импорта:</strong> в словарь добавится запись <code>10:00</code> → <code>десять часов</code></li>
+                                                </ul>
+                                                <p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">
+                                                        <em>Примечание:</em> код <code>&amp;#58;</code> автоматически превратится в обычное двоеточие при импорте, поэтому замена сработает корректно.
+                                                </p>
+                                        </div>
                                 </span>
                         </div>
-                        <div class="form-group">
-                                <button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_ADD#></button>
-                                <a href="?" class="btn btn-default"><#LANG_CANCEL#></a>
+                        <div class="yandex-form-actions" style="margin-top: 30px;">
+                                <button type="submit" name="subm" value="Submit" class="yandex-btn yandex-btn-primary">Импортировать</button>
+                                <a href="?" class="yandex-btn yandex-btn-secondary">Отмена</a>
                                 <input type="hidden" name="view_mode" value="<#VIEW_MODE#>">
                                 <input type="hidden" name="edit_mode" value="<#EDIT_MODE#>">
                                 <input type="hidden" name="mode" value="update">
                         </div>
-                </fieldset>
-        </form>
+                </form>
+        </div>
 [#else VIEW_MODE#]
-        <div id="api_settings" style="padding: 10px;">
-                <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
-                        <fieldset>
-                                <div class="form-group">
-                                        <label class="control-label">Авторизация по OAUTH + FolderID</label>
-                                        <input type="checkbox" name="new_auth" value="checked" onclick="showMe(this)" [#NEW_AUTH#]>
+        <div id="api_settings" class="yandex-container">
+                <div class="yandex-card" style="background: #fffbe6; border: 2px solid #f5d742;">
+                        <h2 class="yandex-title" style="border-bottom-color: #f5d742;">
+                                <span class="yandex-icon">🎙️</span> Настройки Yandex TTS
+                        </h2>
+                        <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="yandex-form">
+                                <!-- Версия API -->
+                                <div class="yandex-section">
+                                        <h3 class="yandex-subtitle">⚙️ Версия API</h3>
+                                        <div class="yandex-form-group">
+                                                <label class="yandex-label">Выберите версию API:</label>
+                                                <div class="yandex-radio-group">
+                                                        <label class="yandex-radio"><input type="radio" name="api_version" value="v1" [#if API_VERSION=="v1"#] checked[#endif#] onclick="updateVoices()"> v1 (REST)</label>
+                                                        <label class="yandex-radio"><input type="radio" name="api_version" value="v3" [#if API_VERSION=="v3"#] checked[#endif#] onclick="updateVoices()"> v3 (REST, API-ключ + folder-id)</label>
+                                                </div>
+                                        </div>
                                 </div>
-                                <div class="form-group apikey" [#if NEW_AUTH=="checked"#]style="display:none"[#endif#]>
-                                        <label class="control-label"> Yandex API key: (*)</label>
-                                        <div class="col-lg-6"><input type="text" class="form-control" name="access_key" value="[#ACCESS_KEY#]" class="input"></div>
+
+                                <!-- Авторизация -->
+                                <div class="yandex-section">
+                                        <h3 class="yandex-subtitle">🔑 Авторизация</h3>
+                                        <div class="yandex-form-group">
+                                                <label class="yandex-label">API-ключ <span class="yandex-required">*</span>:</label>
+                                                <input type="text" class="yandex-input" name="api_key" value="[#API_KEY#]" placeholder="Введите API-ключ сервисного аккаунта">
+                                        </div>
+                                        <!-- Блок folder-id (показывается только для v3) -->
+                                        <div class="yandex-form-group" id="folder_id_group" style="[#if API_VERSION!="v3"#]display:none;[#endif#]">
+                                                <label class="yandex-label">Идентификатор каталога (folder-id) <span class="yandex-required">*</span>:</label>
+                                                <input type="text" class="yandex-input" name="folder_id" value="[#FOLDER_ID#]" placeholder="Введите folder-id каталога">
+                                                <span class="yandex-help">Обязательно для API v3. Можно найти в настройках каталога в Яндекс.Облаке.</span>
+                                        </div>
                                 </div>
-                                <div class="form-group oauth" [#if NEW_AUTH!="checked"#]style="display:none"[#endif#]>
-                                        <label class="control-label"> Yandex OAUTH: (*)</label>
-                                        <div class="col-lg-6"><input type="text" class="form-control" name="oauth" value="[#OAUTH#]" class="input"></div>
-                                </div>
-                                <div class="form-group oauth" [#if NEW_AUTH!="checked"#]style="display:none"[#endif#]>
-                                        <label class="control-label"> Yandex FolderID: (*)</label>
-                                        <div class="col-lg-6"><input type="text" class="form-control" name="folderID" value="[#FOLDERID#]" class="input"></div>
-                                </div>
-                                <div class="form-group">
-                                        <label class="control-label"> Выберите голос:</label>
-                                        <div class="col-lg-6">
-                                                <select class="form-control" name="speaker">
-                                                        <optgroup label="Женские голоса">
-                                                                <option value="jane" [#if SPEAKER=="jane"#] selected[#endif#]>jane</option>
-                                                                <option value="oksana" [#if SPEAKER=="oksana"#] selected[#endif#]>oksana</option>
-                                                                <option value="alyss" [#if SPEAKER=="alyss"#] selected[#endif#]>alyss</option>
-                                                                <option value="omazh"[#if SPEAKER=="omazh"#] selected[#endif#]>omazh</option>
-                                                                <option value="silaerkan"[#if SPEAKER=="silaerkan"#] selected[#endif#]>silaerkan</option>
-                                                                <option value="nastya"[#if SPEAKER=="nastya"#] selected[#endif#]>nastya</option>
-                                                                <option value="sasha"[#if SPEAKER=="sasha"#] selected[#endif#]>sasha</option>
-                                                                <option value="tanya"[#if SPEAKER=="tanya"#] selected[#endif#]>tanya</option>
-                                                                <option value="tatyana_abramova"[#if SPEAKER=="tatyana_abramova"#] selected[#endif#]>tatyana_abramova</option>
-                                                                <option value="voicesearch"[#if SPEAKER=="voicesearch"#] selected[#endif#]>voicesearch</option>
-                                                                <option value="zombie"[#if SPEAKER=="zombie"#] selected[#endif#]>zombie</option>
-                                                        </optgroup>
-                                                        <optgroup label="Мужские голоса">
-                                                                <option value="zahar" [#if SPEAKER=="zahar"#] selected[#endif#]>zahar</option>
-                                                                <option value="ermil" [#if SPEAKER=="ermil"#] selected[#endif#]>ermil</option>
-                                                                <option value="levitan" [#if SPEAKER=="levitan"#] selected[#endif#]>levitan</option>
-                                                                <option value="ermilov" [#if SPEAKER=="ermilov"#] selected[#endif#]>ermilov</option>
-                                                                <option value="kolya" [#if SPEAKER=="kolya"#] selected[#endif#]>kolya</option>
-                                                                <option value="kostya" [#if SPEAKER=="kostya"#] selected[#endif#]>kostya</option>
-                                                                <option value="nick" [#if SPEAKER=="nick"#] selected[#endif#]>nick</option>
-                                                                <option value="erkanyavas" [#if SPEAKER=="erkanyavas"#] selected[#endif#]>erkanyavas</option>
-                                                                <option value="zhenya" [#if SPEAKER=="zhenya"#] selected[#endif#]>zhenya</option>
-                                                                <option value="anton_samokhvalov" [#if SPEAKER=="anton_samokhvalov"#] selected[#endif#]>anton_samokhvalov</option>
-                                                                <option value="ermil_with_tuning" [#if SPEAKER=="ermil_with_tuning"#] selected[#endif#]>ermil_with_tuning</option>
-                                                                <option value="robot" [#if SPEAKER=="robot"#] selected[#endif#]>robot</option>
-                                                                <option value="dude" [#if SPEAKER=="dude"#] selected[#endif#]>dude</option>
-                                                                <option value="smoky" [#if SPEAKER=="smoky"#] selected[#endif#]>smoky</option>
-                                                        </optgroup>
+
+                                <!-- Голос и синтез -->
+                                <div class="yandex-section">
+                                        <h3 class="yandex-subtitle">🗣️ Голос и синтез</h3>
+                                        <div class="yandex-form-group">
+                                                <label class="yandex-label">Язык:</label>
+                                                <select class="yandex-select" name="language" id="yandex_language" onchange="updateVoices()">
+                                                        <option value="ru-RU" [#if LANGUAGE=="ru-RU"#] selected[#endif#]>Русский (ru-RU)</option>
+                                                        <option value="en-US" [#if LANGUAGE=="en-US"#] selected[#endif#]>Английский (en-US)</option>
+                                                </select>
+                                        </div>
+                                        <div class="yandex-form-group">
+                                                <label class="yandex-label">Пол:</label>
+                                                <select class="yandex-select" name="voice_gender" id="yandex_gender" onchange="updateVoices()">
+                                                        <option value="male" [#if VOICE_GENDER=="male"#] selected[#endif#]>Мужской</option>
+                                                        <option value="female" [#if VOICE_GENDER=="female"#] selected[#endif#]>Женский</option>
+                                                </select>
+                                        </div>
+                                        <div class="yandex-form-group">
+                                                <label class="yandex-label">Голос:</label>
+                                                <select class="yandex-select" name="speaker" id="yandex_voice" onchange="updateEmotions()">
+                                                        <!-- заполняется JS -->
+                                                </select>
+                                        </div>
+                                        <div class="yandex-form-group">
+                                                <label class="yandex-label">Амплуа (эмоциональная окраска):</label>
+                                                <select class="yandex-select" name="emotion" id="yandex_emotion">
+                                                        <!-- заполняется JS -->
+                                                </select>
+                                        </div>
+                                        <div class="yandex-form-group">
+                                                <label class="yandex-label">Скорость (0.1–3.0):</label>
+                                                <input type="number" step="0.1" min="0.1" max="3.0" class="yandex-input" name="speed" value="[#SPEED#]">
+                                        </div>
+                                        <div class="yandex-form-group">
+                                                <label class="yandex-label">Формат аудио:</label>
+                                                <select class="yandex-select" name="format">
+                                                        <option value="oggopus" [#if FORMAT=="oggopus"#] selected[#endif#]>OGG Opus</option>
+                                                        <option value="mp3" [#if FORMAT=="mp3"#] selected[#endif#]>MP3</option>
+                                                        <option value="lpcm" [#if FORMAT=="lpcm"#] selected[#endif#]>LPCM</option>
                                                 </select>
                                         </div>
                                 </div>
-                                <div class="form-group">
-                                        <label class="control-label">Эмоциональная окраска голоса:</label>
-                                        <div class="col-lg-6">
-                                                <select class="form-control" name="emotion">
-                                                        <option value="good" [#if EMOTION=="good"#] selected[#endif#]>радостный, доброжелательный</option>
-                                                        <option value="evil" [#if EMOTION=="evil"#] selected[#endif#]>раздраженный</option>
-                                                        <option value="neutral" [#if EMOTION=="neutral"#] selected[#endif#]>нейтральный</option>
-                                                </select>
+
+                                <!-- Дополнительно -->
+                                <div class="yandex-section">
+                                        <h3 class="yandex-subtitle">⚙️ Дополнительно</h3>
+                                        <div class="yandex-form-group">
+                                                <label class="yandex-label">Использовать словарь ударений:</label>
+                                                <div class="yandex-radio-group">
+                                                        <label class="yandex-radio"><input type="radio" name="emphasis" value="1" [#if EMPHASIS=="1"#] checked[#endif#]> Вкл</label>
+                                                        <label class="yandex-radio"><input type="radio" name="emphasis" value="0" [#if EMPHASIS!="1"#] checked[#endif#]> Выкл</label>
+                                                </div>
+                                        </div>
+                                        <!-- Модуль всегда активен (скрытое поле) -->
+                                        <input type="hidden" name="disabled" value="0">
+                                        <div class="yandex-form-group">
+                                                <label class="yandex-label">Отладка (лог в debmes):</label>
+                                                <div class="yandex-radio-group">
+                                                        <label class="yandex-radio"><input type="radio" name="debug" value="1" [#if DEBUG=="1"#] checked[#endif#]> Вкл</label>
+                                                        <label class="yandex-radio"><input type="radio" name="debug" value="0" [#if DEBUG!="1"#] checked[#endif#]> Выкл</label>
+                                                </div>
+                                                <span class="yandex-help">При выключении отладки сообщения не пишутся в debmes (кроме критических ошибок).</span>
                                         </div>
                                 </div>
-                                <div class="form-group">
-                                        <label class="control-label">Использовать словарь ударений:</label>
-                                        <div class="col-lg-6">
-                                                <input type="radio" name="emphasis" value="1"[#if EMPHASIS=="1"#] checked[#endif#]><#LANG_ON#>
-                                                <input type="radio" name="emphasis" value="0"[#if EMPHASIS!="1"#] checked[#endif#]><#LANG_OFF#>
-                                        </div>
-                                </div>
-                                <div class="form-group">
-                                        <label class="control-label"> <#LANG_VALUE#>: (*)</label>
-                                        <div class="col-lg-6">
-                                                <input type="radio" name="disabled" value="0"[#if DISABLED!="1"#] checked[#endif#]><#LANG_ON#>
-                                                <input type="radio" name="disabled" value="1"[#if DISABLED=="1"#] checked[#endif#]><#LANG_OFF#>
-                                        </div>
-                                </div>
-                                <div class="form-actions">
-                                        <button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_UPDATE#></button>
+
+                                <div class="yandex-form-actions">
+                                        <button type="submit" name="subm" value="Submit" class="yandex-btn yandex-btn-primary">Сохранить настройки</button>
+                                        <a href="?view_mode=clear_cache" class="yandex-btn yandex-btn-secondary" onclick="return confirm('Очистить кэш?')">Очистить кэш</a>
                                         <input type="hidden" name="view_mode" value="update_settings">
                                         <input type="hidden" name="mode" value="update">
-                                        <a href="?view_mode=clear_cache" class="btn btn-default">Очистить кэш</a>
                                 </div>
-                        </fieldset>
-                </form>
-                <style>
-                        #emphasis_panel {
-                                border: #ddd solid 1px;
-                                margin-top: 25px;
-                                text-align: center;
-                                padding: 5px;
-                                background-color: #f5f5f5;
-                                border-top-left-radius: 10px;
-                                border-top-right-radius: 10px;
-                        }
-                        #emphasis_panel a:focus {
-                                outline: none;
-                        }
-                        #emphasis_list {
-                                text-align: center;
-                                border: #ddd solid 1px;
-                                padding-top: 20px;
-                                display: none;
-                        }
-                        #emphasis_list p {
-                                margin: 10px 0 10px 0;
-                        }
-                        #emphasis_list form {
-                                padding: 10px 50px 20px 50px;
-                        }
-                        #emphasis_list form table {
-                                width: 100%;
-                        }
-                        #emphasis_list form table tr {
-                                border: #ddd solid 1px;
-                        }
-                        #emphasis_list form table tr.tbl_header {
-                                background-color: #f5f5f5;
-                        }
-                        tr.tbl_header th, tr.tbl_header td {
-                                text-align: center;
-                        }
-                        th.tbl_actions, td.tbl_actions {
-                                width: 100px;
-                        }
-                        th.td_case, td.td_case {
-                                width: 75px;
-                        }
-                        th.td_search_str, td.td_search_str {
-                                text-align: left;
-                                padding-left: 5px;
-                        }
-                        th.td_replace_str, td.td_replace_str {
-                                text-align: left;
-                                padding-left: 5px;
-                        }
-                        tr.tbl_item:hover {
-                                background-color: #eee;
-                        }
-                </style>
-                <div id="emphasis_panel">
-                        <b>[<a href="#" id="emphasis_list_toggle" onclick="return emphasis_list_toggle();">Показать/Скрыть словарь ударений</a>]</b>
-                </div>
-                <div id="emphasis_list">
-                        <a href="?view_mode=emphasis_clear" class="btn btn-danger" onclick="return confirm('Вы действительно хотите удалить все записи из словаря ударений?');">Очистить словарь</a>
-                        <a href="?view_mode=emphasis_import" class="btn btn-default">Импорт словаря</a>
-                        <a href="?view_mode=emphasis_export" class="btn btn-default">Экспорт словаря</a>
-                        <p><i>Для принудительной установки ударения используйте символ + (плюс) перед гласной ударной буквой.</i></p>
-                        <form action="?" method="post" enctype="multipart/form-data" name="frmWrdfix" class="form-horizontal">
-                                <table>
-                                        <tr class="tbl_header">
-                                                <th>Строка для поиска</th>
-                                                <th>Строка для замены</th>
-                                                <th class="td_case">Регистр</th>
-                                                <th class="tbl_actions">&nbsp;</th>
-                                        </tr>
-                                        <tr class="tbl_header">
-                                                <td><input type="text" name="search_str" placeholder="Пример: &laquo;загружена&raquo;" class="form-control"></td>
-                                                <td><input type="text" name="replace_str" placeholder="Пример: &laquo;загр+ужена&raquo;" class="form-control"></td>
-                                                <td><input type="checkbox" name="case" value="1" title="Учитывать регистр"></td>
-                                                <td class="tbl_actions"><button type="submit" name="subm" value="Submit" class="btn btn-primary">Сохранить</button></td>
-                                        </tr>
-                                        [#begin EMPHASIS_LIST#]
-                                        <tr class="tbl_item">
-                                                <td class="td_search_str">[#search_str#]</td>
-                                                <td class="td_replace_str">[#replace_str#]</td>
-                                                <td class="td_case">[#if case=="1"#]<i class="glyphicon glyphicon-ok"></i>[#endif#]</td>
-                                                <td class="tbl_actions">
-                                                        <a href="#" onclick="return emphasis_edit(this);" title="Изменить"><span class="glyphicon glyphicon-pencil"></span></a>
-                                                        &nbsp;
-                                                        <a href="?view_mode=delete_emphasis&id=[#ID#]" onclick="return confirm('Вы уверены? Пожалуйста, подтвердите операцию.')" title="Удалить"><span class="glyphicon glyphicon-remove"></span></a>
-                                                </td>
-                                        </tr>
-                                        [#end EMPHASIS_LIST#]
-                                </table>
-                                <input type="hidden" name="view_mode" value="add_emphasis">
                         </form>
-                        <script type="text/javascript">
-                                function showMe (box) {
-                                        var vis = (box.checked) ? "block" : "none";
-                                        var vis2 = (box.checked) ? "none" : "block";
-                                        $('.oauth').css("display", vis);
-                                        $('.apikey').css("display", vis2);
-                                }
+                </div>
 
-                                $(document).ready(function() {
-                                        if(getCookie('emphasis_list_show') == 'true') {
-                                                $('#emphasis_list_toggle').click();
-                                        }
-                                });
-                                function emphasis_list_toggle() {
-                                        $('#emphasis_list').slideToggle(500, 'swing', function() {
-                                                setCookie('emphasis_list_show', $(this).is(':visible'));
-                                        });
-                                        return false;
-                                }
-                                function emphasis_edit(obj) {
-                                        var tr = $(obj).closest('tr');
-                                        var search_str = $(tr).find('td.td_search_str').text();
-                                        var replace_str = $(tr).find('td.td_replace_str').text();
-                                        var case_html = $(tr).find('td.td_case').html();
-                                        $('input[name=search_str]').val(search_str);
-                                        $('input[name=replace_str]').val(replace_str);
-                                        if(case_html.length > 0) {
-                                                $('input[name=case]').prop('checked', true);
-                                        }
-                                        return false;
-                                }
-                        </script>
+                <!-- Словарь ударений -->
+                <div class="yandex-card" style="margin-top: 30px; background: #fffbe6; border: 2px solid #f5d742;">
+                        <div id="emphasis_panel" class="yandex-emphasis-panel" style="background: #f5d742; border-radius: 12px 12px 0 0; padding: 12px 20px; text-align: center; border-bottom: 1px solid #e6c742;">
+                                <b><a href="#" id="emphasis_list_toggle" onclick="return emphasis_list_toggle();" class="yandex-toggle-link" style="color: #1a1a1a;">📖 Показать/Скрыть словарь ударений</a></b>
+                                &nbsp;|&nbsp;
+                                <b><a href="#" onclick="return toggle_help();" class="yandex-toggle-link" style="color: #1a1a1a;">ℹ️ Как работает словарь?</a></b>
+                        </div>
+                        <div id="emphasis_list" class="yandex-emphasis-list" style="background: #fffbe6; border: 1px solid #f5d742; border-top: none; border-radius: 0 0 12px 12px; padding: 20px 0 10px 0; display: none;">
+
+                                <div id="emphasis_help" style="display: none; background: #e6f7ff; border-left: 4px solid #1890ff; padding: 12px 20px; margin: 0 20px 15px 20px; border-radius: 6px;">
+                                        <h4 style="margin-top: 0; color: #0050b3;">📘 Как работает словарь ударений</h4>
+                                        <p><strong>Словарь ударений</strong> применяется к тексту <strong>перед</strong> отправкой в API синтеза (работает и для v1, и для v3).</p>
+                                        <ul style="padding-left: 20px;">
+                                                <li><strong>Ударение:</strong> Для принудительной установки ударения используйте символ <b>+</b> (плюс) <u>перед</u> ударной гласной в поле <b>«Строка для замены»</b>.<br>
+                                                    <i>Пример:</i> <code>загружена</code> → <code>загр+ужена</code> (ударение на «у»).</li>
+                                                <li><strong>Регистр (флажок «Регистр»):</strong>
+                                                    <ul>
+                                                        <li><b>✔ Включён (учёт регистра)</b> — замена происходит <b>только</b> при точном совпадении регистра букв.
+                                                            <br><i>Пример:</i> <code>дом</code> заменит только <code>дом</code>, но не <code>Дом</code> или <code>ДОМ</code>.</li>
+                                                        <li><b>✘ Выключен (без учёта регистра)</b> — замена происходит независимо от регистра (строчные/прописные).
+                                                            <br><i>Пример:</i> <code>дом</code> заменит <code>дом</code>, <code>Дом</code>, <code>дОм</code> и даже <code>ДОМ</code>.</li>
+                                                    </ul>
+                                                </li>
+                                                <li><strong>Важно:</strong> Замена выполняется <b>последовательно</b> в том порядке, в котором записи перечислены в таблице. Если одно слово входит в состав другого, сначала обрабатывайте более длинные варианты.</li>
+                                        </ul>
+                                </div>
+
+                                <div class="yandex-emphasis-toolbar">
+                                        <a href="?view_mode=emphasis_clear" class="yandex-btn yandex-btn-danger" onclick="return confirm('Вы уверены?')">Очистить словарь</a>
+                                        <a href="?view_mode=emphasis_import" class="yandex-btn yandex-btn-secondary">Импорт</a>
+                                        <a href="?view_mode=emphasis_export" class="yandex-btn yandex-btn-secondary">Экспорт</a>
+                                </div>
+                                <p class="yandex-help" style="text-align:center;"><i>Для принудительной установки ударения используйте символ <b>+</b> (плюс) перед гласной ударной буквой.</i></p>
+                                <form action="?" method="post" enctype="multipart/form-data" name="frmWrdfix" class="yandex-form">
+                                        <table class="yandex-table">
+                                                <thead>
+                                                        <tr>
+                                                                <th>Строка для поиска</th>
+                                                                <th>Строка для замены</th>
+                                                                <th class="td_case">Регистр</th>
+                                                                <th class="tbl_actions">Действие</th>
+                                                        </tr>
+                                                </thead>
+                                                <tbody>
+                                                        <tr class="yandex-table-add">
+                                                                <td><input type="text" name="search_str" placeholder="Пример: загружена" class="yandex-input"></td>
+                                                                <td><input type="text" name="replace_str" placeholder="Пример: загр+ужена" class="yandex-input"></td>
+                                                                <td><input type="checkbox" name="case" value="1" title="Учитывать регистр"></td>
+                                                                <td><button type="submit" name="subm" value="Submit" class="yandex-btn yandex-btn-primary">Сохранить</button></td>
+                                                        </tr>
+                                                        [#begin EMPHASIS_LIST#]
+                                                        <tr class="yandex-table-item">
+                                                                <td class="td_search_str">[#search_str#]</td>
+                                                                <td class="td_replace_str">[#replace_str#]</td>
+                                                                <td class="td_case">[#if case=="1"#]✅[#endif#]</td>
+                                                                <td class="tbl_actions">
+                                                                        <a href="#" onclick="return emphasis_edit(this);" title="Изменить" class="yandex-action-link">✏️</a>
+                                                                        <a href="?view_mode=delete_emphasis&id=[#ID#]" onclick="return confirm('Вы уверены?')" title="Удалить" class="yandex-action-link" style="color:#d93025;">🗑️</a>
+                                                                </td>
+                                                        </tr>
+                                                        [#end EMPHASIS_LIST#]
+                                                </tbody>
+                                        </table>
+                                        <input type="hidden" name="view_mode" value="add_emphasis">
+                                </form>
+                        </div>
                 </div>
         </div>
+
+        <style>
+                /* ===== Яндекс-стиль ===== */
+                .yandex-container { max-width: 900px; margin: 0 auto; font-family: 'Yandex Sans', 'Helvetica Neue', Arial, sans-serif; }
+                .yandex-card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); padding: 28px 32px; transition: box-shadow 0.2s; }
+                .yandex-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.10); }
+                .yandex-title { font-size: 26px; font-weight: 600; color: #1a1a1a; margin-top: 0; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 2px solid #f0f0f0; padding-bottom: 16px; }
+                .yandex-title .yandex-icon { font-size: 30px; }
+                .yandex-subtitle { font-size: 18px; font-weight: 500; color: #333; margin: 20px 0 16px 0; padding-bottom: 8px; border-bottom: 1px dashed #e6e6e6; }
+                .yandex-section { margin-bottom: 28px; }
+                .yandex-form-group { margin-bottom: 18px; }
+                .yandex-label { display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px; }
+                .yandex-required { color: #fc3f1d; font-weight: 600; }
+                .yandex-input, .yandex-select { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; background: #fff; transition: border-color 0.2s, box-shadow 0.2s; color: #1a1a1a; }
+                .yandex-input:focus, .yandex-select:focus { border-color: #fc3f1d; outline: none; box-shadow: 0 0 0 3px rgba(252,63,29,0.15); }
+                .yandex-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 12px 8px; }
+                .yandex-radio-group { display: flex; gap: 24px; padding-top: 4px; flex-wrap: wrap; }
+                .yandex-radio { font-weight: 400; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+                .yandex-radio input[type="radio"] { accent-color: #fc3f1d; width: 16px; height: 16px; }
+                .yandex-form-actions { margin-top: 28px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; padding-top: 18px; border-top: 1px solid #f0f0f0; }
+                .yandex-btn { display: inline-block; padding: 10px 24px; border-radius: 30px; font-weight: 500; font-size: 14px; text-align: center; text-decoration: none; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; line-height: 1.4; }
+                .yandex-btn-primary { background: #fc3f1d; color: #fff; border-color: #fc3f1d; }
+                .yandex-btn-primary:hover { background: #e63515; border-color: #e63515; color: #fff; }
+                .yandex-btn-secondary { background: #f5f5f5; color: #333; border-color: #ddd; }
+                .yandex-btn-secondary:hover { background: #e8e8e8; border-color: #ccc; color: #1a1a1a; }
+                .yandex-btn-danger { background: #d93025; color: #fff; border-color: #d93025; }
+                .yandex-btn-danger:hover { background: #c6281e; border-color: #c6281e; color: #fff; }
+                .yandex-help { display: block; font-size: 13px; color: #777; margin-top: 8px; }
+                .yandex-help-table { font-size: 13px; border-collapse: collapse; margin: 8px 0; }
+                .yandex-help-table td { padding: 4px 8px 4px 0; vertical-align: top; }
+                .yandex-file-input { position: relative; }
+                .yandex-file-input input[type="file"] { position: absolute; opacity: 0; width: 0.1px; height: 0.1px; }
+                .yandex-file-label { display: inline-block; padding: 8px 18px; background: #f0f0f0; border-radius: 30px; cursor: pointer; font-size: 14px; color: #333; border: 1px solid #ddd; transition: 0.2s; }
+                .yandex-file-label:hover { background: #e5e5e5; }
+                .yandex-emphasis-panel { background: #fafafa; border-radius: 12px; padding: 12px 20px; text-align: center; border: 1px solid #eee; margin-bottom: 0; }
+                .yandex-toggle-link { color: #fc3f1d; font-weight: 500; text-decoration: none; font-size: 15px; }
+                .yandex-toggle-link:hover { text-decoration: underline; }
+                .yandex-emphasis-list { padding: 20px 0 10px 0; display: none; border: 1px solid #eee; border-top: none; border-radius: 0 0 12px 12px; background: #fff; }
+                .yandex-emphasis-toolbar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+                .yandex-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+                .yandex-table th { background: #f7f7f7; text-align: left; padding: 10px 12px; font-weight: 500; border-bottom: 2px solid #e0e0e0; }
+                .yandex-table td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+                .yandex-table tr.yandex-table-add td { background: #f9f9f9; }
+                .yandex-table tr.yandex-table-item:hover { background: #f5f5f5; }
+                .yandex-table .td_case { text-align: center; width: 70px; }
+                .yandex-table .tbl_actions { text-align: center; width: 100px; }
+                .yandex-action-link { text-decoration: none; font-size: 16px; padding: 0 4px; transition: 0.1s; }
+                .yandex-action-link:hover { opacity: 0.7; }
+                .yandex-table input.yandex-input { width: 100%; min-width: 100px; }
+                @media (max-width: 600px) { .yandex-card { padding: 18px; } .yandex-radio-group { flex-direction: column; gap: 8px; } .yandex-table th, .yandex-table td { padding: 6px 8px; font-size: 13px; } .yandex-table .td_case, .yandex-table .tbl_actions { width: auto; } }
+        </style>
+
+        <script>
+                // Данные о голосах (из PHP)
+                var voicesData = [#VOICES_DATA#];
+
+                var emotionLabels = {
+                        'neutral': '😐 Нейтральная',
+                        'good': '😊 Радостная, доброжелательная',
+                        'evil': '😠 Раздражённая',
+                        'friendly': '🤝 Дружелюбная',
+                        'strict': '📏 Строгая',
+                        'whisper': '🤫 Шёпот'
+                };
+
+                var savedLanguage = '[#LANGUAGE#]';
+                var savedGender = '[#VOICE_GENDER#]';
+                var savedSpeaker = '[#SPEAKER#]';
+                var savedEmotion = '[#EMOTION#]';
+
+                // Функция показа/скрытия поля folder-id в зависимости от версии API
+                function toggleFolderId() {
+                        var apiVersion = document.querySelector('input[name="api_version"]:checked').value;
+                        var folderGroup = document.getElementById('folder_id_group');
+                        if (apiVersion === 'v3') {
+                                folderGroup.style.display = 'block';
+                        } else {
+                                folderGroup.style.display = 'none';
+                        }
+                }
+
+                function updateVoices() {
+                        var apiVersion = document.querySelector('input[name="api_version"]:checked').value;
+                        var lang = document.getElementById('yandex_language').value;
+                        var gender = document.getElementById('yandex_gender').value;
+                        var voiceSelect = document.getElementById('yandex_voice');
+                        
+                        voiceSelect.innerHTML = '';
+                        
+                        var voices = (voicesData[apiVersion] && voicesData[apiVersion][lang] && voicesData[apiVersion][lang][gender]) 
+                                ? voicesData[apiVersion][lang][gender] 
+                                : [];
+                        
+                        if (voices.length === 0) {
+                                var opt = document.createElement('option');
+                                opt.value = '';
+                                opt.text = 'Нет голосов';
+                                voiceSelect.appendChild(opt);
+                        } else {
+                                for (var i = 0; i < voices.length; i++) {
+                                        var opt = document.createElement('option');
+                                        opt.value = voices[i].id;
+                                        opt.text = voices[i].label;
+                                        if (voices[i].id === savedSpeaker) {
+                                                opt.selected = true;
+                                        }
+                                        voiceSelect.appendChild(opt);
+                                }
+                        }
+                        updateEmotions();
+                        toggleFolderId(); // обновляем видимость folder-id
+                }
+
+                function updateEmotions() {
+                        var apiVersion = document.querySelector('input[name="api_version"]:checked').value;
+                        var lang = document.getElementById('yandex_language').value;
+                        var gender = document.getElementById('yandex_gender').value;
+                        var voiceId = document.getElementById('yandex_voice').value;
+                        var emotionSelect = document.getElementById('yandex_emotion');
+                        
+                        emotionSelect.innerHTML = '';
+                        
+                        var voices = (voicesData[apiVersion] && voicesData[apiVersion][lang] && voicesData[apiVersion][lang][gender]) 
+                                ? voicesData[apiVersion][lang][gender] 
+                                : [];
+                        var selectedVoice = null;
+                        for (var i = 0; i < voices.length; i++) {
+                                if (voices[i].id === voiceId) {
+                                        selectedVoice = voices[i];
+                                        break;
+                                }
+                        }
+                        
+                        var emotions = selectedVoice && selectedVoice.emotions ? selectedVoice.emotions : [];
+                        
+                        if (emotions.length === 0) {
+                                var opt = document.createElement('option');
+                                opt.value = '';
+                                opt.text = 'Нет амплуа';
+                                emotionSelect.appendChild(opt);
+                        } else {
+                                for (var i = 0; i < emotions.length; i++) {
+                                        var opt = document.createElement('option');
+                                        opt.value = emotions[i];
+                                        opt.text = emotionLabels[emotions[i]] || emotions[i];
+                                        if (emotions[i] === savedEmotion) {
+                                                opt.selected = true;
+                                        }
+                                        emotionSelect.appendChild(opt);
+                                }
+                        }
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                        var langSelect = document.getElementById('yandex_language');
+                        if (savedLanguage) {
+                                for (var i = 0; i < langSelect.options.length; i++) {
+                                        if (langSelect.options[i].value === savedLanguage) {
+                                                langSelect.selectedIndex = i;
+                                                break;
+                                        }
+                                }
+                        }
+                        var genderSelect = document.getElementById('yandex_gender');
+                        if (savedGender) {
+                                for (var i = 0; i < genderSelect.options.length; i++) {
+                                        if (genderSelect.options[i].value === savedGender) {
+                                                genderSelect.selectedIndex = i;
+                                                break;
+                                        }
+                                }
+                        }
+                        updateVoices();
+                });
+
+                function emphasis_list_toggle() {
+                        $('#emphasis_list').slideToggle(500, 'swing', function() {
+                                setCookie('emphasis_list_show', $(this).is(':visible'));
+                        });
+                        return false;
+                }
+
+                function toggle_help() {
+                        $('#emphasis_help').slideToggle(300);
+                        return false;
+                }
+
+                function emphasis_edit(obj) {
+                        var tr = $(obj).closest('tr');
+                        var search_str = $(tr).find('td.td_search_str').text();
+                        var replace_str = $(tr).find('td.td_replace_str').text();
+                        var case_html = $(tr).find('td.td_case').html();
+                        $('input[name=search_str]').val(search_str);
+                        $('input[name=replace_str]').val(replace_str);
+                        if(case_html.length > 0) {
+                                $('input[name=case]').prop('checked', true);
+                        }
+                        return false;
+                }
+
+                $(document).ready(function() {
+                        if(getCookie('emphasis_list_show') == 'true') {
+                                $('#emphasis_list_toggle').click();
+                        }
+                        // При загрузке страницы также проверим видимость folder-id
+                        toggleFolderId();
+                });
+        </script>
 [#endif VIEW_MODE#]
