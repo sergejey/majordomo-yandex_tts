@@ -799,8 +799,14 @@ class yandex_tts extends module {
  yandex_tts_emphasis: case boolean NOT NULL DEFAULT FALSE
 EOD;
         parent::dbInstall($data);
-        // Добавляем уникальный индекс для регистрозависимого сравнения
-        SQLExec("ALTER TABLE yandex_tts_emphasis ADD UNIQUE INDEX idx_search_str (search_str(255))");
+        // Проверяем, существует ли уже индекс, чтобы избежать ошибки Duplicate key
+        $indexExists = SQLSelectOne("SHOW INDEX FROM yandex_tts_emphasis WHERE Key_name = 'idx_search_str'");
+        if (!$indexExists) {
+            SQLExec("ALTER TABLE yandex_tts_emphasis ADD UNIQUE INDEX idx_search_str (search_str(255))");
+            $this->logMessage("Unique index idx_search_str added", true);
+        } else {
+            $this->logMessage("Unique index idx_search_str already exists, skipping", true);
+        }		
     }
 
     function uninstall() {
