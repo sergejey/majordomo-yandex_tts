@@ -723,6 +723,7 @@ class yandex_tts extends module {
 
         $this->logMessage("Processing $event (API $api_version): '$message'");
 
+        $originalMessage = $message; // SAY_CACHED_READY несёт оригинал, словарь влияет только на синтез
         // Словарь ударений
         if ($emphasis_enabled == '1') {
             $emphasis = SQLSelect('SELECT * FROM yandex_tts_emphasis');
@@ -751,7 +752,7 @@ class yandex_tts extends module {
                 'filename' => $cachedFile,
                 'destination' => $destination,
                 'event' => $event,
-                'message' => $message,
+                'message' => $originalMessage,
             ]);
             if ($event == 'SAY' && $level >= $minLevel) {
                 playSound($cachedFile, 1, $level);
